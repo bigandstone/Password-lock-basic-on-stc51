@@ -1,0 +1,141 @@
+C51 COMPILER V9.54   MAIN                                                                  12/10/2023 11:36:03 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\Study\51\keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\List
+                    -ings\main.lst) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <stdlib.h>
+   2          #include <STC12C5A60S2.H>
+   3          #include "LCD1602.H"
+   4          #include "MATRIXKEY.H"
+   5          #include "Delay.h"
+   6          
+   7          unsigned char tureword[]={0,0,0,0};
+   8          unsigned char word[]={0,0,0,0};
+   9          unsigned char flag,door;
+  10          unsigned char keynum,i;
+  11          
+  12          void Waitenter(void);
+  13          void Getnum(unsigned char a[]);
+  14          unsigned char Check(void);
+  15          
+  16          void main()
+  17          {
+  18   1              LCD_Init();
+  19   1              while(1)
+  20   1              {
+  21   2                      if(door==0)             //密码锁未被破解
+  22   2                      {
+  23   3                              LCD_clear();
+  24   3                              LCD_ShowString(1,1,"Password:");
+  25   3                              LCD_ShowString(2,1,"____");
+  26   3                              Getnum(word);
+  27   3                              door=Check();
+  28   3                              LCD_clear();
+  29   3                              if(door) LCD_ShowString(1,1,"Correct code!");
+  30   3                              else LCD_ShowString(1,1,"Error code!");
+  31   3                              Waitenter();
+  32   3                      }
+  33   2                      if(door==1)             //密码锁已被破解
+  34   2                      {
+  35   3                              LCD_clear();
+  36   3                              LCD_ShowString(1,1,"1.Chang Code");
+  37   3                              LCD_ShowString(2,1,"2.Game 3.Exit");
+  38   3                              keynum=17;
+  39   3                              while(keynum!=1&&keynum!=2&&keynum!=3) keynum=MatrixKey();//等待获取输入 
+  40   3                              if(keynum==1) door=2;           
+  41   3                              if(keynum==2) door=3;
+  42   3                              if(keynum==3) door=0;
+  43   3                      }
+  44   2                      if(door==2)//change password
+  45   2                      {                       
+  46   3                              LCD_clear();
+  47   3                              LCD_ShowString(1,1,"New Password");
+  48   3                              LCD_ShowString(2,1,"____");
+  49   3                              Getnum(tureword);
+  50   3                              LCD_clear();
+  51   3                              LCD_ShowString(1,1,"It is changed!");
+  52   3                              Waitenter();
+  53   3                              door=1;
+  54   3                      }       
+C51 COMPILER V9.54   MAIN                                                                  12/10/2023 11:36:03 PAGE 2   
+
+  55   2                      if(door==3)//game
+  56   2                      {
+  57   3                              unsigned char score=0;
+  58   3                              unsigned char c1=2,r1=1,c2,r2,r3,c3;
+  59   3                              
+  60   3                              LCD_clear();
+  61   3                              LCD_ShowString(1,1,"Game is loading");
+  62   3                              for(i=1;i<=16;i++){ LCD_ShowChar(2,i,0xFF);Delay((17-i)*100);}
+  63   3                              
+  64   3                              LCD_clear();
+  65   3                              while(1);
+  66   3                      }
+  67   2              }
+  68   1      }
+*** WARNING C280 IN LINE 58 OF main.c: 'c2': unreferenced local variable
+*** WARNING C280 IN LINE 58 OF main.c: 'r2': unreferenced local variable
+*** WARNING C280 IN LINE 58 OF main.c: 'r3': unreferenced local variable
+*** WARNING C280 IN LINE 58 OF main.c: 'c3': unreferenced local variable
+  69          void Waitenter(void)
+  70          {
+  71   1              keynum=17;
+  72   1              while(keynum!=12) keynum=MatrixKey();
+  73   1      }
+  74          void Getnum(unsigned char a[])
+  75          {
+  76   1              unsigned char col=1;
+  77   1              flag=0;
+  78   1              keynum=17;
+  79   1              while(flag==0)                                                                                                                                  //等待键盘输入
+  80   1              {
+  81   2                      keynum=MatrixKey();
+  82   2                      if(keynum<10&&col<=4)
+  83   2                      {                                                                                                                                                       //判断键盘键位为输入
+  84   3                              a[col-1]=keynum;
+  85   3                              LCD_ShowNum(2,col++,keynum,1);
+  86   3                      }
+  87   2                      if(keynum==11&&col>=2) LCD_ShowChar(2,--col,'_');                                                       //判断键盘键位为退格
+  88   2                      if(keynum==12&&col==5) flag=1;                                                                                          //判断键盘键位为确认输入
+  89   2              }
+  90   1      }
+  91          unsigned char Check(void)
+  92          {
+  93   1              unsigned char ret=1;keynum=17;
+  94   1              for(i=0;i<4;i++) if(tureword[i]!=word[i]) ret=0;
+  95   1              return ret;
+  96   1      }
+  97          void Timer0_Isr(void) interrupt 1
+  98          {
+  99   1              static unsigned char cnt=0;
+ 100   1              TL0 = 0x66;                             //设置定时初始值
+ 101   1              TH0 = 0xFC;                             //设置定时初始值
+ 102   1              
+ 103   1              cnt++;
+ 104   1              if(cnt==100)
+ 105   1              {
+ 106   2                      
+ 107   2                      cnt=0;
+ 108   2              }
+ 109   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+C51 COMPILER V9.54   MAIN                                                                  12/10/2023 11:36:03 PAGE 3   
+
+   CODE SIZE        =    504    ----
+   CONSTANT SIZE    =    112    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     13      11
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  4 WARNING(S),  0 ERROR(S)
